@@ -1,0 +1,84 @@
+Matches by team:
+a: 38 matches
+b: 38 matches
+c: 38 matches
+d: 38 matches
+e: 38 matches
+f: 38 matches
+g: 38 matches
+h: 38 matches
+i: 38 matches
+j: 38 matches
+k: 38 matches
+l: 38 matches
+m: 38 matches
+n: 38 matches
+o: 38 matches
+p: 38 matches
+q: 38 matches
+r: 38 matches
+s: 38 matches
+t: 38 matches
+
+Matches by city:
+usfq: 38 matches
+zviz: 19 matches
+wisw: 19 matches
+vrge: 19 matches
+uwiw: 19 matches
+dfjd: 19 matches
+azwk: 19 matches
+irzi: 19 matches
+zkpc: 19 matches
+ngma: 19 matches
+ndgg: 19 matches
+rtsw: 19 matches
+xuwr: 19 matches
+xuzx: 19 matches
+cmgb: 19 matches
+vinm: 19 matches
+nxtb: 19 matches
+fkhc: 19 matches
+uhmg: 19 matches
+
+Matches by day (tot):
+Day 1: 19 matches
+Day 2: 17 matches
+Day 3: 17 matches
+Day 4: 15 matches
+Day 5: 16 matches
+Day 6: 13 matches
+Day 7: 14 matches
+Day 8: 10 matches
+Day 9: 10 matches
+Day 10: 6 matches
+Day 11: 5 matches
+Day 12: 2 matches
+Day 13: 4 matches
+Day 14: 5 matches
+Day 15: 4 matches
+Day 16: 6 matches
+Day 17: 6 matches
+Day 18: 6 matches
+Day 19: 9 matches
+Day 20: 7 matches
+Day 21: 5 matches
+Day 22: 2 matches
+Day 23: 5 matches
+Day 24: 9 matches
+Day 25: 3 matches
+Day 26: 8 matches
+Day 27: 7 matches
+Day 28: 5 matches
+Day 29: 5 matches
+Day 30: 11 matches
+Day 31: 15 matches
+Day 32: 13 matches
+Day 33: 17 matches
+Day 34: 17 matches
+Day 35: 16 matches
+Day 36: 16 matches
+Day 37: 17 matches
+Day 38: 18 matches
+
+Total matches: 380
