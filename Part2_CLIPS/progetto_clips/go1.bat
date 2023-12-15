@@ -1,0 +1,8 @@
+(clear)
+(reset)
+(load 0_Main.clp)
+(load 1_Env.clp)
+(load ./mappe/4/0.clp)
+(load ./src/agent1/2_Agent.clp)
+(reset)
+(run)

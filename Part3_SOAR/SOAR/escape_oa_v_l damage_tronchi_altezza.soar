@@ -1,0 +1,420 @@
+rl -s learning on # enable RL
+indifferent-selection -g # use epsilon-greedy decision making
+indifferent-selection -e 0.1 # 10% deviation from greedy
+
+
+
+##################
+### Initialize ###
+##################
+sp {propose*inizializza*gioco
+    (state <s> ^superstate nil -^name)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name inizializza-gioco)
+}
+
+sp {apply*inizializza*gioco
+    (state <s> ^operator.name inizializza-gioco)
+-->
+    (<s> ^name escape 
+         ^previous <p>
+          # per gestire lo stato della finestra
+         ^danno-estremita-finestra 15 
+         ^danno-centro-finestra 2  
+         ^vita-finestra 50
+         ^finestra-rotta false
+
+         # utilizzo della fionda
+         ^fionda-creata false
+         # per la costruzione della scala.
+         # Ipotesi ->Servono 2 tronchi siccome ciascuno è di 1 metro, mentre l'agente è di 1.5 metri
+         ^altezza-raggiungibile 1.5 # altezza uomo all inizio
+         ^altezza-finestra 10.5
+         ^altezza-tronco 1         
+         ^tronco-in-mano false
+         ^scalinata-salita false
+     
+         #Verifica condizioni di exit
+         ^fuggito false
+         ^combinato-oggetti false
+         ^lanciato-elastico-alla-finestra false
+         ^lanciato-rametto-alla-finestra false      
+        )
+    (<p> ^name none)
+    (write (crlf) |Inizia il gioco!|)
+}
+
+##############################
+### Reinforcement learning ###
+### Inizializzazione delle ricompense ###
+##############################
+sp {rl*combina-ramoscello-elastico
+    (state <s> ^name escape ^operator <o> +)
+    (<o> ^name combina-ramoscello-elastico)
+-->
+    (<s> ^operator <o> = 0)
+}
+
+sp {rl*combina-ramoscello-roccia
+    (state <s> ^name escape ^operator <o> +)
+    (<o> ^name combina-ramoscello-roccia)
+-->
+    (<s> ^operator <o> = 0)
+}
+
+sp {rl*combina-roccia-elastico
+    (state <s> ^name escape ^operator <o> +)
+    (<o> ^name combina-roccia-elastico)
+-->
+    (<s> ^operator <o> = 0)
+}
+
+sp {rl*spara-centro-finestra
+    (state <s> ^name escape ^operator <o> +)
+    (<o> ^name spara-centro-finestra)
+-->
+    (<s> ^operator <o> = 0)
+}
+
+sp {rl*spara-estremita-finestra
+    (state <s> ^name escape ^operator <o> +)
+    (<o> ^name spara-estremita-finestra)
+-->
+    (<s> ^operator <o> = 0)
+}
+
+sp {rl*lancia-elastico
+    (state <s> ^name escape ^operator <o> +)
+    (<o> ^name lancia-elastico)
+-->
+    (<s> ^operator <o> = 0)
+}
+
+sp {rl*lancia-ramoscello
+    (state <s> ^name escape ^operator <o> +)
+    (<o> ^name lancia-ramoscello)
+-->
+    (<s> ^operator <o> = 0)
+}
+
+
+sp {rl*raccogli-tronco
+    (state <s> ^name escape ^operator <o> +)
+    (<o> ^name raccogli-tronco)
+-->
+    (<s> ^operator <o> = 0)
+}
+
+sp {rl*sposta-tronco
+    (state <s> ^name escape ^operator <o> +)
+    (<o> ^name sposta-tronco)
+-->
+    (<s> ^operator <o> = 0)
+}
+
+sp {rl*osserva-rottura-finestra
+    (state <s> ^name escape ^operator <o> +)
+    (<o> ^name osserva-rottura-finestra)
+-->
+    (<s> ^operator <o> = 0)
+}
+
+sp {rl*sali-scalinata
+    (state <s> ^name escape ^operator <o> +)
+    (<o> ^name sali-scalinata)
+-->
+    (<s> ^operator <o> = 0)
+}
+
+#############################
+### Possibili item craftabili ###
+#############################
+sp {propose*combina-ramoscello-elastico
+    (state <s> ^name escape ^previous <previous-action> ^fionda-creata false ^finestra-rotta false ^combinato-oggetti false ^tronco-in-mano false)
+    (<previous-action> ^name <> combina-ramoscello-elastico)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name combina-ramoscello-elastico)
+}
+
+sp {apply*combina-ramoscello-elastico
+    (state <s> ^operator.name combina-ramoscello-elastico ^previous <p>)
+-->
+    (<s> ^previous <p> - <new-previous-action> +)
+    (<new-previous-action> ^name combina-ramoscello-elastico ^reward 1)
+    (<s> ^fionda-creata false - true +)
+    (<s> ^combinato-oggetti false - true +)
+    (write (crlf) |Ha combinato il rametto con l'elastico e creato una fionda!|)
+}
+
+sp {propose*combina-ramoscello-roccia
+    (state <s> ^name escape ^previous <previous-action> ^fionda-creata false ^finestra-rotta false ^combinato-oggetti false ^tronco-in-mano false)
+    (<previous-action> ^name <> combina-ramoscello-roccia)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name combina-ramoscello-roccia)
+}
+
+sp {apply*combina-ramoscello-roccia
+    (state <s> ^operator.name combina-ramoscello-roccia ^previous <p>)
+-->
+    (<s> ^previous <p> - <new-previous-action> +)
+    (<new-previous-action> ^name combina-ramoscello-roccia ^reward -1)
+    (<s> ^combinato-oggetti false - true +)
+    (write (crlf) |Ha combinato il rametto con la pietra senza ottenere nulla.|)
+}
+
+# rock + elastico = nothing
+sp {propose*combina-roccia-elastico
+    (state <s> ^name escape ^previous <previous-action> ^fionda-creata false ^finestra-rotta false ^combinato-oggetti false ^tronco-in-mano false)
+    (<previous-action> ^name <> combina-roccia-elastico)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name combina-roccia-elastico)
+}
+
+sp {apply*combina-roccia-elastico
+    (state <s> ^operator.name combina-roccia-elastico ^previous <p>)
+-->
+    (<s> ^previous <p> - <new-previous-action> +)
+    (<new-previous-action> ^name combina-roccia-elastico ^reward -1)
+    (<s> ^combinato-oggetti false - true +)
+    (write (crlf) |Ha combinato la pietra con la elastico senza ottenere nulla.|)
+}
+
+
+
+#########################################
+### Lanci di oggetti a caso, senza usare la fionda ###
+#########################################
+sp {propose*lancia-elastico
+    (state <s> ^name escape ^previous <previous-action> ^fionda-creata false ^finestra-rotta false ^lanciato-pietra-alla-finestra false ^tronco-in-mano false)
+    (<previous-action> ^name <> lancia-elastico)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name lancia-elastico)
+}
+
+sp {apply*lancia-elastico
+    (state <s> ^operator.name lancia-elastico ^previous <p>)
+-->
+    (<s> ^previous <p> - <new-previous-action> +)
+    (<new-previous-action> ^name lancia-elastico ^reward -1)
+    (<s> ^lanciato-pietra-alla-finestra false - true +)
+    (write (crlf) |Ha lanciato una pietra alla finestra senza romperla.|)
+}
+
+# shooting the window with a sprig
+sp {propose*lancia-ramoscello
+    (state <s> ^name escape ^previous <previous-action> ^fionda-creata false ^finestra-rotta false ^lanciato-rametto-alla-finestra false ^tronco-in-mano false)
+    (<previous-action> ^name <> lancia-ramoscello)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name lancia-ramoscello)
+}
+
+sp {apply*lancia-ramoscello
+    (state <s> ^operator.name lancia-ramoscello ^previous <p>)
+-->
+    (<s> ^previous <p> - <new-previous-action> +)
+    (<new-previous-action> ^name lancia-ramoscello ^reward -1)
+    (<s> ^lanciato-rametto-alla-finestra false - true +)
+    (write (crlf) |Ha lanciato un rametto alla finestra senza romperla.|)
+}
+
+
+
+######################################
+### Spari utilizzando la fionda ###
+######################################
+sp {propose*spara-centro-finestra
+    (state <s> ^name escape ^fionda-creata true ^finestra-rotta false  ^tronco-in-mano false
+    ^vita-finestra > 0
+    )
+   
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name spara-centro-finestra)
+}
+
+sp {apply*spara-centro-finestra
+    (state <s> ^operator.name spara-centro-finestra ^previous <p> ^vita-finestra <vita-finestra> ^danno-centro-finestra <danno-centro-finestra> )
+-->
+    (<s> ^previous <p> - <new-previous-action> +)
+    (<new-previous-action> ^name spara-centro-finestra ^reward 0)
+    (<s> ^vita-finestra <vita-finestra> - ( - <vita-finestra> <danno-centro-finestra>) +)
+    (write (crlf) |Ha sparato al centro ma la finestra non sembra aver subito danni.|)
+}
+
+# shooting the edge and breaking the window
+sp {propose*spara-estremita-finestra
+    (state <s> ^name escape  ^fionda-creata true ^finestra-rotta false  ^vita-finestra > 0 ^tronco-in-mano false)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name spara-estremita-finestra)
+}
+
+sp {apply*spara-estremita-finestra
+    (state <s> ^operator.name spara-estremita-finestra ^previous <p> ^vita-finestra <vita-finestra> ^danno-estremita-finestra <danno-estremita-finestra>)
+-->
+    (<s> ^previous <p> - <new-previous-action> +)
+    (<new-previous-action> ^name spara-estremita-finestra ^reward 1)
+    (<s> ^vita-finestra <vita-finestra> - ( - <vita-finestra> <danno-estremita-finestra>) +)
+    (write (crlf) |Ha sparato sulle estremità della finestra e la finestra si è danneggiata parecchio (- | <danno-estremita-finestra> | )!  Vita finestra | ( - <vita-finestra> <danno-estremita-finestra>)||)
+}
+
+# shooting the edge and breaking the window
+sp {propose*osserva-rottura-finestra
+    (state <s> ^name escape  ^previous <previous-action>  ^finestra-rotta false  ^vita-finestra <= 0 )
+    (<previous-action> ^name <> osserva-rottura-finestra)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name osserva-rottura-finestra)
+}
+
+sp {apply*osserva-rottura-finestra
+
+    (state <s> ^operator.name osserva-rottura-finestra ^previous <p> ^finestra-rotta false   ^vita-finestra <= 0 )
+-->
+    (<s> ^previous <p> - <new-previous-action> +)
+    (<new-previous-action> ^name osserva-rottura-finestra ^reward 1)
+    (<s> ^finestra-rotta false - true +)
+    (write (crlf) |La finestra si è frantumata in mille pezzi!|)
+}
+
+
+#######################
+### Raccogli tronchi  (nota: potrei mettere un vincolo in modo che l'agente non raccolga piu di 2 tronchi) ###
+#######################
+sp {propose*raccogli-tronco
+    (state <s> ^name escape   ^previous <previous-action>  ^tronco-in-mano false  )
+     ( <s> ^altezza-raggiungibile  < <altezza> ^scalinata-salita false)
+    (<s> ^altezza-finestra <altezza>)
+     (<previous-action> ^name <> raccogli-tronco)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name raccogli-tronco)
+}
+
+sp {apply*raccogli-tronco
+    (state <s> ^operator.name raccogli-tronco ^previous <p>  )
+-->
+    (<s> ^previous <p> - <new-previous-action> +)
+    (<new-previous-action> ^name raccogli-tronco ^reward 0)
+    (<s> ^tronco-in-mano false - true + )
+    (write (crlf) |Ha raccolto un tronco.|)
+}
+
+
+###################################
+### Spostamento dei tronchi per costruire una scala ###
+###################################
+sp {propose*sposta-tronco
+    (state <s> ^name escape ^previous <previous-action>  ^tronco-in-mano true ) 
+    (<previous-action> ^name <>  sposta-tronco)
+    ( <s> ^altezza-raggiungibile < <altezza> ^scalinata-salita false)
+    (<s> ^altezza-finestra <altezza>)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name sposta-tronco)
+}
+
+sp {apply*sposta-tronco
+    (state <s> ^operator.name sposta-tronco ^previous <p> ^altezza-raggiungibile <altezza-raggiungibile>
+    ^altezza-tronco <altezza-tronco>)
+-->
+    (<s> ^previous <p> - <new-previous-action> +)
+    (<new-previous-action> ^name sposta-tronco ^reward 1)
+    (<s> ^altezza-raggiungibile <altezza-raggiungibile> -  (+  <altezza-raggiungibile> <altezza-tronco>)+)
+    (<s> ^tronco-in-mano true - false +)
+    (write (crlf) |Ha spostato un tronco sotto la finestra!|)
+}
+
+
+
+###############################
+### Sale e scappa ###
+###############################
+sp {propose*sali-scalinata
+    (state <s> ^name escape ^previous <previous-action> ^altezza-raggiungibile  <altezza> ^scalinata-salita false)
+    (<s> ^altezza-finestra <altezza>)
+    (<previous-action> ^name <> sali-scalinata)
+-->
+    (<s> ^operator <o> +)
+    (<o> ^name sali-scalinata)
+}
+
+
+sp {apply*sali-scalinata
+    (state <s> ^operator.name sali-scalinata ^previous <p> ^fuggito false)
+-->
+    (<s> ^previous <p> - <new-previous-action> +)
+    (<new-previous-action> ^name sali-scalinata ^reward 1)
+    (<s> ^scalinata-salita false - true +)
+    (write (crlf) |Ha scalato la scala!|)
+}
+
+sp {verifica-fuga-completata
+    (state <s> ^name escape ^scalinata-salita true ^finestra-rotta true ^fuggito false)
+-->
+    (<s> ^fuggito false - true +)
+    (write (crlf) |Ha attraversato la finestra ed è riuscito a fuggire!|)
+}
+
+
+
+
+
+############################################
+### Reinforcement learning apply rewards ###
+### oppure la notazione di Left-Right ^reward.value ###
+############################################
+sp {rl*apply-rewards
+    (state <s> ^name escape ^reward-link <r> ^previous <previous-action>)
+    (<previous-action> ^reward <reward>)
+-->
+    (<r> ^reward <rr>)
+    (<rr> ^value <reward>)
+    (write (crlf) |Reward: | <reward>)
+}
+
+
+
+################################
+### Escape: termine del gioco ###
+################################
+sp {halt*escape
+    (state <s> ^name escape ^fuggito true)
+-->
+    (write (crlf) |Fine del gioco!|)
+    (halt)
+}
+
+# halt se ha lanciato un rametto, allora questo si è rotto e non si può scappare
+sp {halt*lanciato-rametto-alla-finestra
+    (state <s> ^name escape ^fuggito false ^lanciato-rametto-alla-finestra true)
+-->
+    (write (crlf) |Avendo rotto il rametto, l'agente non può scappare. FINE!|)
+    (halt)
+}
+
+# halt se ha lanciato un rametto, allora questo si è rotto e non si può scappare
+sp {halt*lanciato-elastico-alla-finestra
+    (state <s> ^name escape ^fuggito false ^fionda-creata false  ^lanciato-elastico-alla-finestra true)
+-->
+    (write (crlf) |Avendo perso l'elastico, l'agente non può scappare. FINE!|)
+    (halt)
+}
+
+
+
+# halt se si è combinato degli oggetti ma non si è ottenuta una fionda -> non si può scappare
+# ( è un caso più generico dei precedenti )
+sp {halt*wrong-combination
+    (state <s> ^name escape ^fuggito false ^fionda-creata false ^combinato-oggetti true)
+-->
+    (write (crlf) |Ha provato a combinare degli oggetti, ma non ha trovato la combinazione giusta, non può scappare!|)
+    (halt)
+}
+
